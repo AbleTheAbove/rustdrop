@@ -21,9 +21,13 @@ fn on_service_discovered(
     result: zeroconf::Result<ServiceDiscovery>,
     _context: Option<Arc<dyn Any>>,
 ) {
-    println!("Service discovered: {:?}", result.unwrap());
-
-    // ...
+    let result = result.unwrap();
+    let host_name = result.address().to_owned();
+    if host_name == "" || host_name == "127.0.0.1" {
+        drop();
+    } else {
+        println!("Drop target discovered: {:?}", &result.name());
+    }
 }
 
 // Connect to a socket provided by zeroconf browse
@@ -31,7 +35,7 @@ use std::io::prelude::*;
 use std::net::TcpStream;
 
 fn drop_send() -> std::io::Result<()> {
-    let address = format!("{}:{}", "127.0.0.1", "12345");
+    let address = format!("{}:{}", "127.0.0.1", "22657");
     let mut stream = TcpStream::connect(address)?;
 
     stream.write(&[1])?;
@@ -43,7 +47,8 @@ fn drop_send() -> std::io::Result<()> {
 pub fn drop() {
     let result = drop_send();
     match result {
-        Err(e) => { // NOTE(Able): Error handling, Rarely do I do that
+        Err(e) => {
+            // NOTE(Able): Error handling, Rarely do I do that
             println!("Error: {:?}", e.kind());
         }
         Ok(()) => {
@@ -51,4 +56,3 @@ pub fn drop() {
         }
     }
 }
-

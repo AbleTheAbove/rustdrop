@@ -4,7 +4,9 @@ use std::path::Path;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 
+mod drop;
 mod recieve;
+
 fn main() {
     let recieve_command = SubCommand::with_name("recieve")
         .about("allows the mode to be set to recieve")
@@ -66,6 +68,7 @@ impl RDrop {
     pub fn drop(self, file_path: &str) {
         if Path::new(&file_path).exists() {
             //Validate the file exists
+            drop::browse();
             println!("File found! Dropping {:?}", &file_path);
         } else {
             println!("File {:?} not found", &file_path);
