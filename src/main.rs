@@ -69,6 +69,7 @@ impl RDrop {
         if Path::new(&file_path).exists() {
             //Validate the file exists
             drop::browse();
+
             println!("File found! Dropping {:?}", &file_path);
         } else {
             println!("File {:?} not found", &file_path);

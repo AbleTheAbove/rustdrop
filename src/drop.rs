@@ -24,8 +24,8 @@ fn on_service_discovered(
     let result = result.unwrap();
     let host_name = result.address().to_owned();
     if host_name == "" || host_name == "127.0.0.1" {
-        drop();
     } else {
+        drop();
         println!("Drop target discovered: {:?}", &result.name());
     }
 }
