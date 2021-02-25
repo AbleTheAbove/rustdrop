@@ -25,3 +25,30 @@ fn on_service_discovered(
 
     // ...
 }
+
+// Connect to a socket provided by zeroconf browse
+use std::io::prelude::*;
+use std::net::TcpStream;
+
+fn drop_send() -> std::io::Result<()> {
+    let address = format!("{}:{}", "127.0.0.1", "12345");
+    let mut stream = TcpStream::connect(address)?;
+
+    stream.write(&[1])?;
+    stream.read(&mut [0; 128])?;
+
+    Ok(())
+}
+
+pub fn drop() {
+    let result = drop_send();
+    match result {
+        Err(e) => { // NOTE(Able): Error handling, Rarely do I do that
+            println!("Error: {:?}", e.kind());
+        }
+        Ok(()) => {
+            println!("File Dropped!");
+        }
+    }
+}
+
