@@ -1,51 +1,27 @@
 use std::any::Any;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Duration;
 use zeroconf::prelude::*;
-use zeroconf::{MdnsService, ServiceRegistration, TxtRecord};
+use zeroconf::{MdnsBrowser, ServiceDiscovery};
 
-#[derive(Default, Debug)]
-pub struct Context {
-    service_name: String,
-}
+pub fn browse() {
+    let mut browser = MdnsBrowser::new("_http._tcp");
 
-fn main() {
-    let mut service = MdnsService::new("_http._tcp", 8080);
-    let mut txt_record = TxtRecord::new();
-    let context: Arc<Mutex<Context>> = Arc::default();
+    browser.set_service_discovered_callback(Box::new(on_service_discovered));
 
-    txt_record.insert("foo", "bar").unwrap();
-
-    service.set_registered_callback(Box::new(on_service_registered));
-    service.set_context(Box::new(context));
-    service.set_txt_record(txt_record);
-
-    let event_loop = service.register().unwrap();
+    let event_loop = browser.browse_services().unwrap();
 
     loop {
-        // calling `poll()` will keep this service alive
+        // calling `poll()` will keep this browser alive
         event_loop.poll(Duration::from_secs(0)).unwrap();
     }
 }
 
-fn on_service_registered(
-    result: zeroconf::Result<ServiceRegistration>,
-    context: Option<Arc<dyn Any>>,
+fn on_service_discovered(
+    result: zeroconf::Result<ServiceDiscovery>,
+    _context: Option<Arc<dyn Any>>,
 ) {
-    let service = result.unwrap();
-
-    println!("Service registered: {:?}", service);
-
-    let context = context
-        .as_ref()
-        .unwrap()
-        .downcast_ref::<Arc<Mutex<Context>>>()
-        .unwrap()
-        .clone();
-
-    context.lock().unwrap().service_name = service.name().clone();
-
-    println!("Context: {:?}", context);
+    println!("Service discovered: {:?}", result.unwrap());
 
     // ...
 }
