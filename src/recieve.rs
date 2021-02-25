@@ -9,17 +9,18 @@ pub struct Context {
     service_name: String,
 }
 
-fn main() {
+pub fn register() {
     let mut service = MdnsService::new("_http._tcp", 8080);
-    let mut txt_record = TxtRecord::new();
     let context: Arc<Mutex<Context>> = Arc::default();
 
-    txt_record.insert("foo", "bar").unwrap();
+    /*
+        let mut txt_record = TxtRecord::new();
+        txt_record.insert("foo", "bar").unwrap();
+        service.set_txt_record(txt_record);
+    */
 
     service.set_registered_callback(Box::new(on_service_registered));
     service.set_context(Box::new(context));
-    service.set_txt_record(txt_record);
-
     let event_loop = service.register().unwrap();
 
     loop {

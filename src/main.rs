@@ -4,6 +4,7 @@ use std::path::Path;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
 
+mod recieve;
 fn main() {
     let recieve_command = SubCommand::with_name("recieve")
         .about("allows the mode to be set to recieve")
@@ -11,7 +12,7 @@ fn main() {
         .author(AUTHORS)
         .arg(
             Arg::with_name("auto")
-                .short("aa")
+                .short("a")
                 .help("Automatically accept and save all drops"),
         );
 
@@ -54,9 +55,9 @@ fn main() {
             println!("Printing normally...");
         }
     }
-
-    //don't auto start recieve
-    //rdrop.recieve();
+    if let Some(_matches) = matches.subcommand_matches("recieve") {
+        rdrop.recieve();
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -72,5 +73,6 @@ impl RDrop {
     }
     fn recieve(self) {
         // NOTE(Able): Yeah good luck buddy
+        recieve::register(); // loops (like it should)
     }
 }
